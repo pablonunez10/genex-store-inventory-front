@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { Product } from "../../types";
 import { productsService } from "../../services/products.service";
-import { MdAdd } from "react-icons/md";
 
 export default function Inventario() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,22 +27,13 @@ export default function Inventario() {
       <Navbar />
       <div className="container mx-auto p-8 animate-fadeIn">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Inventario
-            </h1>
-            <p className="text-gray-600">
-              Gestiona el stock de productos
-            </p>
-          </div>
-          <Link
-            to="/admin/productos/nuevo"
-            className="btn-gradient flex items-center gap-2"
-          >
-            <MdAdd className="text-xl" />
-            Nuevo Producto
-          </Link>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Inventario
+          </h1>
+          <p className="text-gray-600">
+            Gestiona el stock de productos
+          </p>
         </div>
 
         {loading ? (
@@ -77,12 +66,6 @@ export default function Inventario() {
                           <p className="text-lg font-medium">
                             No hay productos en el inventario
                           </p>
-                          <Link
-                            to="/admin/productos/nuevo"
-                            className="btn-gradient mt-2"
-                          >
-                            Crear primer producto
-                          </Link>
                         </div>
                       </td>
                     </tr>
