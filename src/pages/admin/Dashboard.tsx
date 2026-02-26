@@ -4,7 +4,8 @@ import {
   MdInventory,
   MdShoppingCart,
   MdPointOfSale,
-  MdAssessment
+  MdAssessment,
+  MdCategory
 } from "react-icons/md";
 
 export default function AdminDashboard() {
@@ -15,6 +16,13 @@ export default function AdminDashboard() {
       to: "/admin/inventario",
       icon: MdInventory,
       gradient: "bg-gradient-primary",
+    },
+    {
+      title: "Categorías",
+      description: "Gestionar categorías de productos",
+      to: "/admin/categorias",
+      icon: MdCategory,
+      gradient: "bg-gradient-info",
     },
     {
       title: "Cargar Compra",
@@ -62,9 +70,10 @@ export default function AdminDashboard() {
                 className="group relative modern-card text-white overflow-hidden hover-lift"
                 style={{
                   background: `linear-gradient(135deg, ${card.gradient.includes('primary') ? '#1e3a8a, #3b82f6' :
-                      card.gradient.includes('success') ? '#047857, #10b981' :
-                        card.gradient.includes('secondary') ? '#0f172a, #475569' :
-                          '#d97706, #f59e0b'
+                      card.gradient.includes('info') ? '#0891b2, #06b6d4' :
+                        card.gradient.includes('success') ? '#047857, #10b981' :
+                          card.gradient.includes('secondary') ? '#0f172a, #475569' :
+                            '#d97706, #f59e0b'
                     })`,
                 }}
               >

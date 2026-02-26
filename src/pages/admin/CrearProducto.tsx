@@ -1,21 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Input from "../../components/Input";
 import TextArea from "../../components/TextArea";
+import Select from "../../components/Select";
+import { Category } from "../../types";
 import { productsService } from "../../services/products.service";
+import { categoriesService } from "../../services/categories.service";
 import { MdArrowBack, MdSave } from "react-icons/md";
 
 export default function CrearProducto() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     sku: "",
     description: "",
     salePrice: "",
+    categoryId: "",
   });
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await categoriesService.getAll();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error cargando categorías:", error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +46,7 @@ export default function CrearProducto() {
         sku: formData.sku,
         description: formData.description || undefined,
         salePrice: parseFloat(formData.salePrice),
+        categoryId: formData.categoryId,
       });
       navigate("/admin/inventario");
     } catch (err: any) {
@@ -91,21 +110,39 @@ export default function CrearProducto() {
               }
             />
 
-            <Input
-              label="Precio de Venta (Gs.)"
-              type="number"
-              step="0.01"
-              placeholder="Ej: 5000000"
-              value={formData.salePrice}
-              onChange={(e) =>
-                setFormData({ ...formData, salePrice: e.target.value })
-              }
-              required
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Select
+                label="Categoría"
+                value={formData.categoryId}
+                onChange={(e) =>
+                  setFormData({ ...formData, categoryId: e.target.value })
+                }
+                required
+              >
+                <option value="">Seleccionar categoría</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </Select>
+
+              <Input
+                label="Precio de Venta (Gs.)"
+                type="number"
+                step="0.01"
+                placeholder="Ej: 5000000"
+                value={formData.salePrice}
+                onChange={(e) =>
+                  setFormData({ ...formData, salePrice: e.target.value })
+                }
+                required
+              />
+            </div>
 
             {error && (
               <div className="bg-red-50 border-2 border-red-200 text-red-700 p-4 rounded-xl animate-fadeIn">
-                <span className="font-medium">⚠️ {error}</span>
+                <span className="font-medium">{error}</span>
               </div>
             )}
 
