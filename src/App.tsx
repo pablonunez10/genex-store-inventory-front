@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import Inventario from './pages/admin/Inventario';
 import CrearProducto from './pages/admin/CrearProducto';
+import Categorias from './pages/admin/Categorias';
 import Compras from './pages/admin/Compras';
 import Ventas from './pages/admin/Ventas';
 import Reportes from './pages/admin/Reportes';
@@ -49,6 +50,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <CrearProducto />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categorias"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <Categorias />
             </ProtectedRoute>
           }
         />

@@ -5,6 +5,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   setAuth: (user: User, token: string) => void;
   logout: () => void;
   loadFromStorage: () => void;
@@ -14,6 +15,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  isLoading: true,
 
   setAuth: (user, token) => {
     localStorage.setItem('token', token);
@@ -32,7 +34,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     const userStr = localStorage.getItem('user');
     if (token && userStr) {
       const user = JSON.parse(userStr);
-      set({ user, token, isAuthenticated: true });
+      set({ user, token, isAuthenticated: true, isLoading: false });
+    } else {
+      set({ isLoading: false });
     }
   },
 }));

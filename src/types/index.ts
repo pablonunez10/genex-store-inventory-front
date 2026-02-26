@@ -10,6 +10,15 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -18,6 +27,8 @@ export interface Product {
   currentStock: number;
   salePrice: string;
   isActive: boolean;
+  categoryId: string;
+  category: Category;
   createdAt: string;
   updatedAt: string;
 }

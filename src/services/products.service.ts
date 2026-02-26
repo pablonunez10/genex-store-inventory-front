@@ -17,6 +17,7 @@ export const productsService = {
     sku: string;
     description?: string;
     salePrice: number;
+    categoryId: string;
   }): Promise<Product> => {
     const response = await api.post<Product>('/products', data);
     return response.data;
@@ -26,6 +27,7 @@ export const productsService = {
     name?: string;
     description?: string;
     salePrice?: number;
+    categoryId?: string;
   }): Promise<Product> => {
     const response = await api.put<Product>(`/products/${id}`, data);
     return response.data;

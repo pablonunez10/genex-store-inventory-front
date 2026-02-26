@@ -48,6 +48,7 @@ export default function Inventario() {
                   <tr>
                     <th>SKU</th>
                     <th>Nombre</th>
+                    <th>Categoría</th>
                     <th>Descripción</th>
                     <th>Stock</th>
                     <th>Precio Venta</th>
@@ -58,7 +59,7 @@ export default function Inventario() {
                   {products.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="text-center py-12 text-gray-500 bg-white"
                       >
                         <div className="flex flex-col items-center gap-3">
@@ -77,6 +78,11 @@ export default function Inventario() {
                         </td>
                         <td className="font-semibold text-gray-800">
                           {product.name}
+                        </td>
+                        <td>
+                          <span className="badge-modern bg-blue-100 text-blue-700">
+                            {product.category.name}
+                          </span>
                         </td>
                         <td className="text-gray-600">
                           {product.description || "-"}
