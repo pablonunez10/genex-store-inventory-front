@@ -67,6 +67,7 @@ export default function Compras() {
           sku: formData.productSku,
           description: formData.productDescription || undefined,
           salePrice: parseFloat(formData.salePrice),
+          categoryId: formData.productCategoryId,
         });
         productId = newProduct.id;
       }
@@ -164,6 +165,27 @@ export default function Compras() {
                         })
                       }
                     />
+                  </div>
+
+                  <div className="mt-4">
+                    <Select
+                      label="Categoría"
+                      value={formData.productCategoryId}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          productCategoryId: e.target.value,
+                        })
+                      }
+                      required
+                    >
+                      <option value="">Seleccionar categoría</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </Select>
                   </div>
                 </>
               ) : (
