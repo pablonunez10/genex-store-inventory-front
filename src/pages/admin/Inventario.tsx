@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { Product } from "../../types";
 import { productsService } from "../../services/products.service";
 
 export default function Inventario() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,13 +55,14 @@ export default function Inventario() {
                     <th>Stock</th>
                     <th>Precio Venta</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {products.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={8}
                         className="text-center py-12 text-gray-500 bg-white"
                       >
                         <div className="flex flex-col items-center gap-3">
@@ -112,6 +115,14 @@ export default function Inventario() {
                           >
                             {product.isActive ? "Activo" : "Inactivo"}
                           </span>
+                        </td>
+                        <td>
+                          <button
+                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                            onClick={() => navigate(`/admin/productos/${product.id}`)}
+                          >
+                            Ver / Editar
+                          </button>
                         </td>
                       </tr>
                     ))

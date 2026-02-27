@@ -28,6 +28,8 @@ export const productsService = {
     description?: string;
     salePrice?: number;
     categoryId?: string;
+    currentStock?: number;
+    isActive?: boolean;
   }): Promise<Product> => {
     const response = await api.put<Product>(`/products/${id}`, data);
     return response.data;
