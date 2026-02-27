@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Input from "../../components/Input";
 import Select from "../../components/Select";
-import { Product } from "../../types";
+import { Product, Category } from "../../types";
 import { productsService } from "../../services/products.service";
 import { purchasesService } from "../../services/purchases.service";
+import { categoriesService } from "../../services/categories.service";
 import { format } from "date-fns";
 
 export default function Compras() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isNewProduct, setIsNewProduct] = useState(false);
@@ -19,6 +21,7 @@ export default function Compras() {
     productName: "",
     productSku: "",
     productDescription: "",
+    productCategoryId: "",
     quantity: "",
     costPrice: "",
     salePrice: "",
@@ -29,6 +32,7 @@ export default function Compras() {
 
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, []);
 
   const loadProducts = async () => {
@@ -37,6 +41,15 @@ export default function Compras() {
       setProducts(data.filter((p) => p.isActive));
     } catch (error) {
       console.error("Error cargando productos:", error);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const data = await categoriesService.getAll();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error cargando categorías:", error);
     }
   };
 
