@@ -8,6 +8,7 @@ export default function Inventario() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -21,6 +22,23 @@ export default function Inventario() {
       console.error("Error cargando productos:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (product: Product) => {
+    if (!confirm(`¿Estás seguro de eliminar "${product.name}"? El producto será desactivado.`)) {
+      return;
+    }
+
+    setDeleting(product.id);
+    try {
+      await productsService.delete(product.id);
+      await loadProducts();
+    } catch (error) {
+      console.error("Error eliminando producto:", error);
+      alert("Error al eliminar el producto");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -117,12 +135,21 @@ export default function Inventario() {
                           </span>
                         </td>
                         <td>
-                          <button
-                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
-                            onClick={() => navigate(`/admin/productos/${product.id}`)}
-                          >
-                            Ver / Editar
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                              onClick={() => navigate(`/admin/productos/${product.id}`)}
+                            >
+                              Ver / Editar
+                            </button>
+                            <button
+                              className="text-red-600 hover:text-red-800 hover:underline font-medium transition-colors disabled:opacity-50"
+                              onClick={() => handleDelete(product)}
+                              disabled={deleting === product.id}
+                            >
+                              {deleting === product.id ? "..." : "Eliminar"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))

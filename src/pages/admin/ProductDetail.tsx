@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Input from "../../components/Input";
 import Select from "../../components/Select";
-import { Product, Category } from "../../types";
+import { Product, Category, ProductVariant } from "../../types";
 import { productsService } from "../../services/products.service";
 import { categoriesService } from "../../services/categories.service";
 
@@ -21,6 +21,14 @@ export default function ProductoDetalle() {
     description: "",
     salePrice: "",
     categoryId: "",
+    currentStock: "",
+  });
+  const [showVariantModal, setShowVariantModal] = useState(false);
+  const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
+  const [variantForm, setVariantForm] = useState({
+    name: "",
+    sku: "",
+    salePrice: "",
     currentStock: "",
   });
 
@@ -108,6 +116,75 @@ export default function ProductoDetalle() {
     }
     setIsEditing(false);
     setError("");
+  };
+
+  const openVariantModal = (variant?: ProductVariant) => {
+    if (variant) {
+      setEditingVariant(variant);
+      setVariantForm({
+        name: variant.name,
+        sku: variant.sku,
+        salePrice: variant.salePrice,
+        currentStock: variant.currentStock.toString(),
+      });
+    } else {
+      setEditingVariant(null);
+      setVariantForm({ name: "", sku: "", salePrice: "", currentStock: "0" });
+    }
+    setShowVariantModal(true);
+  };
+
+  const closeVariantModal = () => {
+    setShowVariantModal(false);
+    setEditingVariant(null);
+    setVariantForm({ name: "", sku: "", salePrice: "", currentStock: "0" });
+    setError("");
+  };
+
+  const handleSaveVariant = async () => {
+    if (!variantForm.name || !variantForm.sku || !variantForm.salePrice) {
+      setError("Nombre, SKU y precio son requeridos");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+
+    try {
+      if (editingVariant) {
+        await productsService.updateVariant(editingVariant.id, {
+          name: variantForm.name,
+          salePrice: parseFloat(variantForm.salePrice),
+          currentStock: parseInt(variantForm.currentStock),
+        });
+      } else {
+        await productsService.createVariant(id!, {
+          name: variantForm.name,
+          sku: variantForm.sku,
+          salePrice: parseFloat(variantForm.salePrice),
+        });
+      }
+      closeVariantModal();
+      await loadProduct();
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Error al guardar variante");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteVariant = async (variant: ProductVariant) => {
+    if (!confirm(`¿Eliminar la variante "${variant.name}"?`)) return;
+
+    setSaving(true);
+    try {
+      await productsService.deleteVariant(variant.id);
+      await loadProduct();
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Error al eliminar variante");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -358,7 +435,160 @@ export default function ProductoDetalle() {
             </>
           )}
         </div>
+
+        {/* Sección de Variantes */}
+        <div className="glass-card rounded-2xl p-6 max-w-2xl mt-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Variantes</h2>
+            <button
+              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              onClick={() => openVariantModal()}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Agregar Variante
+            </button>
+          </div>
+
+          {product.variants && product.variants.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-2 px-2 text-gray-600 font-medium">Nombre</th>
+                    <th className="text-left py-2 px-2 text-gray-600 font-medium">SKU</th>
+                    <th className="text-left py-2 px-2 text-gray-600 font-medium">Precio</th>
+                    <th className="text-left py-2 px-2 text-gray-600 font-medium">Stock</th>
+                    <th className="text-left py-2 px-2 text-gray-600 font-medium">Estado</th>
+                    <th className="text-left py-2 px-2 text-gray-600 font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.variants.map((variant) => (
+                    <tr key={variant.id} className="border-b border-gray-100">
+                      <td className="py-2 px-2 text-gray-800">{variant.name}</td>
+                      <td className="py-2 px-2 text-gray-600 font-mono text-xs">{variant.sku}</td>
+                      <td className="py-2 px-2 text-gray-800">Gs. {parseFloat(variant.salePrice).toLocaleString()}</td>
+                      <td className={`py-2 px-2 font-bold ${
+                        variant.currentStock < 10
+                          ? "text-red-600"
+                          : variant.currentStock < 30
+                          ? "text-yellow-600"
+                          : "text-green-600"
+                      }`}>
+                        {variant.currentStock}
+                      </td>
+                      <td className="py-2 px-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          variant.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-200 text-gray-600"
+                        }`}>
+                          {variant.isActive ? "Activo" : "Inactivo"}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2">
+                        <div className="flex gap-2">
+                          <button
+                            className="text-blue-600 hover:text-blue-800 text-xs"
+                            onClick={() => openVariantModal(variant)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            className="text-red-600 hover:text-red-800 text-xs"
+                            onClick={() => handleDeleteVariant(variant)}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">
+              No hay variantes para este producto. Agrega variantes como "iPhone 13 Pro", "Samsung A56", etc.
+            </p>
+          )}
+        </div>
       </div>
+
+      {/* Modal de Variante */}
+      {showVariantModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              {editingVariant ? "Editar Variante" : "Nueva Variante"}
+            </h3>
+
+            <div className="space-y-4">
+              <Input
+                label="Nombre de la variante"
+                type="text"
+                placeholder="Ej: iPhone 13 Pro, Samsung A56"
+                value={variantForm.name}
+                onChange={(e) => setVariantForm({ ...variantForm, name: e.target.value })}
+                required
+              />
+
+              <Input
+                label="SKU"
+                type="text"
+                placeholder="Ej: VID-IPH13PRO"
+                value={variantForm.sku}
+                onChange={(e) => setVariantForm({ ...variantForm, sku: e.target.value })}
+                disabled={!!editingVariant}
+                required
+              />
+
+              <Input
+                label="Precio de Venta (Gs.)"
+                type="number"
+                value={variantForm.salePrice}
+                onChange={(e) => setVariantForm({ ...variantForm, salePrice: e.target.value })}
+                min="0"
+                required
+              />
+
+              {editingVariant && (
+                <Input
+                  label="Stock Actual"
+                  type="number"
+                  value={variantForm.currentStock}
+                  onChange={(e) => setVariantForm({ ...variantForm, currentStock: e.target.value })}
+                  min="0"
+                />
+              )}
+            </div>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded-lg mt-4 text-sm">
+                {error}
+              </div>
+            )}
+
+            <div className="flex gap-2 mt-6">
+              <button
+                className="flex-1 btn bg-gray-200 text-gray-800 hover:bg-gray-300"
+                onClick={closeVariantModal}
+              >
+                Cancelar
+              </button>
+              <button
+                className="flex-1 btn bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleSaveVariant}
+                disabled={saving}
+              >
+                {saving ? "Guardando..." : "Guardar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

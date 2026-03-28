@@ -1,5 +1,5 @@
 import api from './api';
-import { Product } from '../types';
+import { Product, ProductVariant } from '../types';
 
 export const productsService = {
   getAll: async (): Promise<Product[]> => {
@@ -37,5 +37,29 @@ export const productsService = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/products/${id}`);
+  },
+
+  // Variantes
+  createVariant: async (productId: string, data: {
+    name: string;
+    sku: string;
+    salePrice: number;
+  }): Promise<ProductVariant> => {
+    const response = await api.post<ProductVariant>(`/products/${productId}/variants`, data);
+    return response.data;
+  },
+
+  updateVariant: async (variantId: string, data: {
+    name?: string;
+    salePrice?: number;
+    currentStock?: number;
+    isActive?: boolean;
+  }): Promise<ProductVariant> => {
+    const response = await api.put<ProductVariant>(`/products/variants/${variantId}`, data);
+    return response.data;
+  },
+
+  deleteVariant: async (variantId: string): Promise<void> => {
+    await api.delete(`/products/variants/${variantId}`);
   },
 };

@@ -19,6 +19,18 @@ export interface Category {
   updatedAt: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  productId: string;
+  name: string;
+  sku: string;
+  currentStock: number;
+  salePrice: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -29,6 +41,7 @@ export interface Product {
   isActive: boolean;
   categoryId: string;
   category: Category;
+  variants?: ProductVariant[];
   createdAt: string;
   updatedAt: string;
 }

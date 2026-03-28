@@ -19,4 +19,17 @@ export const purchasesService = {
     const response = await api.post<PurchaseOrder>('/purchases', data);
     return response.data;
   },
+
+  createVariantPurchase: async (data: {
+    variantId: string;
+    quantity: number;
+    costPrice: number;
+    salePrice: number;
+    supplier?: string;
+    invoiceNumber?: string;
+    purchaseDate: string;
+  }): Promise<any> => {
+    const response = await api.post('/purchases/variant', data);
+    return response.data;
+  },
 };
